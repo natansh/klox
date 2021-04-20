@@ -34,17 +34,18 @@ class GenerateAst {
                 println("package com.ionsofimagination.klox")
                 println()
                 println("sealed class $baseName {")
+
                 for (type in types) {
                     val className = type.split(":")[0].trim()
                     val fields = type.split(":")[1].trim()
-                    defineType(writer, className, fields)
+                    defineType(writer, baseName, className, fields)
                 }
                 println("}")
                 close()
             }
         }
 
-        private fun defineType(writer: PrintWriter, className: String, fieldList: String) {
+        private fun defineType(writer: PrintWriter, baseName: String, className: String, fieldList: String) {
             val fields = fieldList.split(", ")
             writer.apply {
                 println("    data class $className(")
@@ -54,7 +55,7 @@ class GenerateAst {
                     // To ensure proper indentation, indent by 8 spaces.
                     "        val $fieldName: $fieldType"
                 })
-                println("    )")
+                println("    ): $baseName()")
             }
         }
     }
