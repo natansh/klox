@@ -3,9 +3,6 @@ package com.ionsofimagination.tool
 import java.io.PrintWriter
 import kotlin.system.exitProcess
 
-data class Hello(val a: String, val b: String,) {
-
-}
 // Kotlin makes the creation of data classes far easier than Java does, hence this code to generate a file doesn't seem
 // necessary. Nonetheless, writing it such that it's easier to follow the flow of the book in future chapters.
 class GenerateAst {
@@ -20,11 +17,13 @@ class GenerateAst {
             defineAst(outputDir, "Expr", listOf(
                 "Binary: Expr left, Token operator, Expr right",
                 "Grouping: Expr expression",
-                // Using "Any" instead of "Object" in Kotlin.
-                "Literal: Any value",
+                // Using "Any?" instead of "Object" in Kotlin.
+                "Literal: Any? value",
                 "Unary: Token operator, Expr right",
             ))
         }
+
+        private val indent = "    "
 
         // The types are still defined Java-style, but are converted into Kotlin code through string manipulation.
         fun defineAst(outputDir: String, baseName: String, types: List<String>) {
@@ -34,28 +33,43 @@ class GenerateAst {
                 println("package com.ionsofimagination.klox")
                 println()
                 println("sealed class $baseName {")
-
+                defineVisitor(this, baseName, types)
                 for (type in types) {
                     val className = type.split(":")[0].trim()
                     val fields = type.split(":")[1].trim()
-                    defineType(writer, baseName, className, fields)
+                    defineType(this, baseName, className, fields)
                 }
+                println()
+                println("${indent}abstract fun <R> accept(visitor: Visitor<R>): R")
                 println("}")
                 close()
+            }
+        }
+
+        private fun defineVisitor(writer: PrintWriter, baseName: String, types: List<String>) {
+            writer.apply {
+                println("${indent}interface Visitor<R> {")
+                for (type in types) {
+                    val className = type.split(":")[0].trim()
+                    println("${indent}${indent}fun visit$className$baseName(${baseName.toLowerCase()}: $className): R")
+                }
+                println("${indent}}")
             }
         }
 
         private fun defineType(writer: PrintWriter, baseName: String, className: String, fieldList: String) {
             val fields = fieldList.split(", ")
             writer.apply {
-                println("    data class $className(")
+                println("${indent}data class $className(")
                 println(fields.joinToString(",\n") { field ->
                     val fieldType = field.split(" ")[0].trim()
                     val fieldName = field.split(" ")[1].trim()
                     // To ensure proper indentation, indent by 8 spaces.
-                    "        val $fieldName: $fieldType"
+                    "${indent}${indent}val $fieldName: $fieldType"
                 })
-                println("    ): $baseName()")
+                println("${indent}): $baseName() {")
+                println("${indent}${indent}override fun <R> accept(visitor: Visitor<R>): R = visitor.visit$className$baseName(this)")
+                println("$indent}")
             }
         }
     }
