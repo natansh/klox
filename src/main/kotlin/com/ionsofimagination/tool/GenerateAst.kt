@@ -20,10 +20,12 @@ class GenerateAst {
                 // Using "Any?" instead of "Object" in Kotlin.
                 "Literal: Any? value",
                 "Unary: Token operator, Expr right",
+                "Variable: Token name"
             ))
             defineAst(outputDir, "Stmt", listOf(
                 "Expression: Expr expression",
-                "Print: Expr expression"
+                "Print: Expr expression",
+                "Var: Token name, Expr initializer"
             ))
         }
 
