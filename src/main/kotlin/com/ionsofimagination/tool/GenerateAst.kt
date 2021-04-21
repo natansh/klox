@@ -25,7 +25,7 @@ class GenerateAst {
             defineAst(outputDir, "Stmt", listOf(
                 "Expression: Expr expression",
                 "Print: Expr expression",
-                "Var: Token name, Expr initializer"
+                "Var: Token name, Expr? initializer"
             ))
         }
 

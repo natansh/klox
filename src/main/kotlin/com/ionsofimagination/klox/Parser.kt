@@ -8,18 +8,37 @@ class Parser(private val tokens: List<Token>) {
     fun parse(): List<Stmt> {
         var statements: MutableList<Stmt> = mutableListOf()
         while (!isAtEnd()) {
-            statements.add(statement())
+            declaration()?.let { statements.add(it) }
         }
         return statements
     }
 
+    private fun declaration(): Stmt? {
+        try {
+            if (match(TokenType.VAR)) return varDeclaration()
+            return statement()
+        } catch (error: ParseError) {
+            synchronize()
+            return null
+        }
+    }
+
+    private fun varDeclaration(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
+        var initializer: Expr? = null
+        if (match(TokenType.EQUAL)) {
+            initializer = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
+        return Stmt.Var(name, initializer)
+    }
+
     private fun statement(): Stmt {
-        val stmt = if (match(TokenType.PRINT)) {
+        return if (match(TokenType.PRINT)) {
             printStatement()
         } else {
             expressionStatement()
         }
-        return stmt
     }
 
     private fun printStatement(): Stmt.Print {
@@ -91,6 +110,7 @@ class Parser(private val tokens: List<Token>) {
             match(TokenType.NIL) -> Expr.Literal(null)
             match(TokenType.NUMBER) -> Expr.Literal(token.literal)
             match(TokenType.STRING) -> Expr.Literal(token.literal)
+            match(TokenType.IDENTIFIER) -> Expr.Variable(token)
             match(TokenType.LEFT_PAREN) -> {
                 val expression = expression()
                 consume(TokenType.RIGHT_PAREN, "Expect ')' after expression")
@@ -102,7 +122,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun consume(tokenType: TokenType, message: String): Token {
         if (match(tokenType)) {
-            return peek()
+            return previous()
         }
         throw error(peek(), message)
     }

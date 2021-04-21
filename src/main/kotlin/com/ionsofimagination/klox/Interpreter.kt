@@ -5,6 +5,7 @@ import kotlin.contracts.contract
 
 
 class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+    private val environment = Environment()
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -95,6 +96,9 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         }
     }
 
+    override fun visitVariableExpr(expr: Expr.Variable): Any? {
+        return environment.get(expr.name)
+    }
 
     // This is implemented differently in the book for Java. The use of Kotlin Contracts seemed more elegant here.
     // References:
@@ -141,5 +145,11 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     override fun visitPrintStmt(stmt: Stmt.Print) {
         val value = evaluate(stmt.expression)
         println(stringify(value))
+    }
+
+
+    override fun visitVarStmt(stmt: Stmt.Var) {
+        val value = stmt.initializer?.let { evaluate(it) }
+        environment.define(stmt.name.lexeme, value)
     }
 }
