@@ -1,17 +1,16 @@
 package com.ionsofimagination.klox
 
-import java.time.temporal.TemporalAdjusters.previous
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 
 class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
-    private var environment = Environment()
+    private val environment = Environment()
 
     fun interpret(statements: List<Stmt>) {
         try {
             for (statement in statements) {
-                execute(statement)
+                evaluate(statement)
             }
         } catch (error: RuntimeError) {
             Klox.runtimeError(error)
@@ -101,12 +100,6 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return environment.get(expr.name)
     }
 
-    override fun visitAssignExpr(expr: Expr.Assign): Any? {
-        val value = evaluate(expr.value)
-        environment.assign(expr.name, value)
-        return value
-    }
-
     // This is implemented differently in the book for Java. The use of Kotlin Contracts seemed more elegant here.
     // References:
     // 1. https://ncorti.com/blog/discovering-kotlin-contracts
@@ -136,7 +129,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return true
     }
 
-    private fun execute(stmt: Stmt) {
+    private fun evaluate(stmt: Stmt) {
         stmt.accept(this)
     }
 
@@ -158,22 +151,5 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     override fun visitVarStmt(stmt: Stmt.Var) {
         val value = stmt.initializer?.let { evaluate(it) }
         environment.define(stmt.name.lexeme, value)
-    }
-
-    override fun visitBlockStmt(stmt: Stmt.Block) {
-        // TODO: This should be statements.
-        executeBlock(stmt.expression, Environment(environment))
-    }
-
-    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
-        val previous = this.environment
-        try {
-            this.environment = environment
-            for (statement in statements) {
-                execute(statement)
-            }
-        } finally {
-            this.environment = previous
-        }
     }
 }

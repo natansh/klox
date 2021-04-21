@@ -4,7 +4,6 @@ sealed class Stmt {
     interface Visitor<R> {
         fun visitExpressionStmt(stmt: Expression): R
         fun visitPrintStmt(stmt: Print): R
-        fun visitBlockStmt(stmt: Block): R
         fun visitVarStmt(stmt: Var): R
     }
     data class Expression(
@@ -16,11 +15,6 @@ sealed class Stmt {
         val expression: Expr
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitPrintStmt(this)
-    }
-    data class Block(
-        val expression: List<Stmt>
-    ): Stmt() {
-        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBlockStmt(this)
     }
     data class Var(
         val name: Token,

@@ -36,8 +36,6 @@ class Parser(private val tokens: List<Token>) {
     private fun statement(): Stmt {
         return if (match(TokenType.PRINT)) {
             printStatement()
-        } else if (match(TokenType.LEFT_BRACE)) {
-            return Stmt.Block(block())
         } else {
             expressionStatement()
         }
@@ -49,17 +47,6 @@ class Parser(private val tokens: List<Token>) {
         return Stmt.Print(value)
     }
 
-    private fun block(): List<Stmt> {
-        val statements: MutableList<Stmt> = ArrayList()
-        while (!isAtEnd() && peek().type != TokenType.RIGHT_BRACE) {
-            // It wasn't immediately clear how the Lox reference implementation was dealing with
-            // null's arising in declaration.
-            declaration()?.let { statements.add(it) }
-        }
-        consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
-        return statements
-    }
-
     private fun expressionStatement(): Stmt.Expression {
         val value = expression()
         consume(TokenType.SEMICOLON, "Expected ';' after value")
@@ -67,22 +54,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun expression(): Expr {
-        return assignment()
-    }
-
-    private fun assignment(): Expr {
-        val expr = equality()
-        if (match(TokenType.EQUAL)) {
-            val equals = previous()
-            val value = assignment()
-
-            if (expr is Expr.Variable) {
-                val name = expr.name
-                return Expr.Assign(name, value)
-            }
-            error(equals, "Invalid assignment target.")
-        }
-        return expr
+        return equality()
     }
 
     private fun equality(): Expr {
@@ -163,7 +135,7 @@ class Parser(private val tokens: List<Token>) {
     private fun synchronize() {
         advance()
         while (!isAtEnd()) {
-            if (previous().type == TokenType.SEMICOLON) return
+            if (previous().type === TokenType.SEMICOLON) return
             when (peek().type) {
                 TokenType.CLASS,
                 TokenType.FUN,

@@ -24,10 +24,6 @@ class AstPrinter: Expr.Visitor<String> {
     override fun visitVariableExpr(expr: Expr.Variable): String {
         TODO("Not yet implemented")
     }
-
-    override fun visitAssignExpr(expr: Expr.Assign): String {
-        TODO("Not yet implemented")
-    }
 }
 
 // Temporary hack to test out AST Printing
