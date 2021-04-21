@@ -57,9 +57,9 @@ class GenerateAst {
                 println("${indent}interface Visitor<R> {")
                 for (type in types) {
                     val className = type.split(":")[0].trim()
-                    println("${indent}${indent}fun visit$className$baseName(${baseName.toLowerCase()}: $className): R")
+                    println("$indent${indent}fun visit$className$baseName(${baseName.toLowerCase()}: $className): R")
                 }
-                println("${indent}}")
+                println("$indent}")
             }
         }
 
@@ -71,10 +71,10 @@ class GenerateAst {
                     val fieldType = field.split(" ")[0].trim()
                     val fieldName = field.split(" ")[1].trim()
                     // To ensure proper indentation, indent by 8 spaces.
-                    "${indent}${indent}val $fieldName: $fieldType"
+                    "$indent${indent}val $fieldName: $fieldType"
                 })
-                println("${indent}): $baseName() {")
-                println("${indent}${indent}override fun <R> accept(visitor: Visitor<R>): R = visitor.visit$className$baseName(this)")
+                println("$indent): $baseName() {")
+                println("$indent${indent}override fun <R> accept(visitor: Visitor<R>): R = visitor.visit$className$baseName(this)")
                 println("$indent}")
             }
         }
