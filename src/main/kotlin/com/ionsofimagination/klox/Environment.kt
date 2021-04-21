@@ -1,19 +1,29 @@
 package com.ionsofimagination.klox
 
-class Environment {
-    private var values: MutableMap<String, Any> = HashMap()
+class Environment(private val enclosing: Environment? = null) {
+    private var values: MutableMap<String, Any?> = HashMap()
 
     fun define(name: String, value: Any?) {
-        if (value != null) {
-            values[name] = value
-        } else {
-            values.remove(name)
-        }
+        values[name] = value
     }
 
-    fun get(name: Token): Any {
-        return values.getOrElse(name.lexeme) {
-            throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
+    fun assign(name: Token, value: Any?) {
+        if (values.containsKey(name.lexeme)) {
+            values[name.lexeme] = value
+            return
         }
+        if (enclosing != null) {
+            enclosing.assign(name, value)
+            return
+        }
+        throw RuntimeError( name, "Undefined variable '${name.lexeme}'." )
+    }
+
+    fun get(name: Token): Any? {
+        if (values.containsKey(name.lexeme)) {
+           return values[name.lexeme]
+        }
+        if (enclosing != null) return enclosing.get(name)
+        throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
     }
 }
