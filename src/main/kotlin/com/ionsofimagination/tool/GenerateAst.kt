@@ -21,6 +21,10 @@ class GenerateAst {
                 "Literal: Any? value",
                 "Unary: Token operator, Expr right",
             ))
+            defineAst(outputDir, "Stmt", listOf(
+                "Expression: Expr expression",
+                "Print: Expr expression"
+            ))
         }
 
         private val indent = "    "
