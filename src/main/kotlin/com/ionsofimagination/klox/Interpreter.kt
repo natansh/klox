@@ -4,14 +4,15 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 
-class Interpreter: Expr.Visitor<Any?> {
+class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
-    fun interpret(expr: Expr) {
+    fun interpret(statements: List<Stmt>) {
         try {
-            val value = evaluate(expr)
-            println(stringify(value))
+            for (statement in statements) {
+                evaluate(statement)
+            }
         } catch (error: RuntimeError) {
-            Klox.runtimeError(error);
+            Klox.runtimeError(error)
         }
     }
 
@@ -124,7 +125,21 @@ class Interpreter: Expr.Visitor<Any?> {
         return true
     }
 
+    private fun evaluate(stmt: Stmt) {
+        stmt.accept(this)
+    }
+
     private fun evaluate(expr: Expr): Any? {
         return expr.accept(this)
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        // This might have side-effects.
+        evaluate(stmt.expression)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
     }
 }

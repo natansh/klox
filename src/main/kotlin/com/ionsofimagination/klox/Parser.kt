@@ -5,12 +5,33 @@ class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
     var current: Int = 0
 
-    fun parse(): Expr? {
-        return try {
-            expression()
-        } catch (error: ParseError) {
-            null
+    fun parse(): List<Stmt> {
+        var statements: MutableList<Stmt> = mutableListOf()
+        while (!isAtEnd()) {
+            statements.add(statement())
         }
+        return statements
+    }
+
+    private fun statement(): Stmt {
+        val stmt = if (match(TokenType.PRINT)) {
+            printStatement()
+        } else {
+            expressionStatement()
+        }
+        return stmt
+    }
+
+    private fun printStatement(): Stmt.Print {
+        val value = expression()
+        consume(TokenType.SEMICOLON, "Expected ';' after value")
+        return Stmt.Print(value)
+    }
+
+    private fun expressionStatement(): Stmt.Expression {
+        val value = expression()
+        consume(TokenType.SEMICOLON, "Expected ';' after value")
+        return Stmt.Expression(value)
     }
 
     private fun expression(): Expr {
@@ -118,7 +139,7 @@ class Parser(private val tokens: List<Token>) {
         return false
     }
 
-    private fun isAtEnd(): Boolean = current >= tokens.size
+    private fun isAtEnd(): Boolean = peek().type == TokenType.EOF
     private fun peek(): Token = tokens[current]
     private fun previous(): Token = tokens[current - 1]
     private fun advance() = current++
