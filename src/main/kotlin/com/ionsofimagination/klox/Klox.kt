@@ -9,7 +9,9 @@ import kotlin.system.exitProcess
 
 class Klox {
     companion object {
+        private var interpreter = Interpreter()
         private var hadError = false
+        private var hadRuntimeError = false
 
         fun main(args: Array<String>) {
             // There are likely better utilities in Kotlin for dealing with arguments.
@@ -31,6 +33,7 @@ class Klox {
             run(String(bytes, Charset.defaultCharset()))
             // Indicate an error in the exit code.
             if (hadError) exitProcess(65)
+            if (hadRuntimeError) exitProcess(70)
         }
 
         private fun runPrompt() {
@@ -52,6 +55,9 @@ class Klox {
             // Stop if there was a syntax error.
             if (hadError) return
             println(AstPrinter().print(expression!!))
+            // Expression should be non-null for it to be interpreted.
+            if (expression == null) return
+            interpreter.interpret(expression)
         }
 
         fun error(line: Int, message: String) {
@@ -64,6 +70,11 @@ class Klox {
             } else {
                 report(token.line, " at '" + token.lexeme + "'", message!!)
             }
+        }
+
+        fun runtimeError(error: RuntimeError) {
+            System.err.println("${error.message}\n[line ${error.token.line}]");
+            hadRuntimeError = true
         }
 
         private fun report(
