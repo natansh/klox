@@ -15,6 +15,7 @@ class GenerateAst {
             }
             val outputDir = args[0]
             defineAst(outputDir, "Expr", listOf(
+                "Assign: Token name, Expr value",
                 "Binary: Expr left, Token operator, Expr right",
                 "Grouping: Expr expression",
                 // Using "Any?" instead of "Object" in Kotlin.
@@ -26,6 +27,7 @@ class GenerateAst {
                 "Expression: Expr expression",
                 "If: Expr expression, Stmt thenBranch, Stmt elseBranch",
                 "Print: Expr expression",
+                "Block: List<Stmt> expression",
                 "Var: Token name, Expr? initializer"
             ))
         }
