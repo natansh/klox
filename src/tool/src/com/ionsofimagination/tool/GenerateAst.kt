@@ -25,7 +25,7 @@ class GenerateAst {
             ))
             defineAst(outputDir, "Stmt", listOf(
                 "Expression: Expr expression",
-                "If: Expr expression, Stmt thenBranch, Stmt elseBranch",
+                "If: Expr expression, Stmt thenBranch, Stmt? elseBranch",
                 "Print: Expr expression",
                 "Block: List<Stmt> expression",
                 "Var: Token name, Expr? initializer"

@@ -16,7 +16,7 @@ sealed class Stmt {
     data class If(
         val expression: Expr,
         val thenBranch: Stmt,
-        val elseBranch: Stmt
+        val elseBranch: Stmt?
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitIfStmt(this)
     }

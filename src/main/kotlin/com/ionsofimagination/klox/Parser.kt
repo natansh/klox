@@ -29,7 +29,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             initializer = expression()
         }
-        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
         return Stmt.Var(name, initializer)
     }
 
@@ -38,9 +38,20 @@ class Parser(private val tokens: List<Token>) {
             printStatement()
         } else if (match(TokenType.LEFT_BRACE)) {
             return Stmt.Block(block())
+        } else if (match(TokenType.IF)) {
+            ifStatement()
         } else {
             expressionStatement()
         }
+    }
+
+    private fun ifStatement(): Stmt.If {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after if.")
+        val condition = expression()
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+        val thenStatement = statement()
+        var elseStatement: Stmt? = if (match(TokenType.ELSE)) { statement() } else null
+        return Stmt.If(condition, thenStatement, elseStatement)
     }
 
     private fun printStatement(): Stmt.Print {
