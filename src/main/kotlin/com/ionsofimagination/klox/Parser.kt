@@ -1,5 +1,8 @@
 package com.ionsofimagination.klox
 
+import com.ionsofimagination.klox.Stmt.While
+import java.util.*
+
 
 class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
@@ -42,9 +45,48 @@ class Parser(private val tokens: List<Token>) {
             ifStatement()
         } else if (match(TokenType.WHILE)) {
             whileStatement()
+        } else if (match(TokenType.FOR)) {
+            forStatement()
         } else {
             expressionStatement()
         }
+    }
+
+    private fun forStatement(): Stmt {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+        val initializer: Stmt? = when {
+            match(TokenType.SEMICOLON) ->  null
+            match(TokenType.VAR) ->  varDeclaration()
+            else ->  expressionStatement()
+        }
+
+        var condition: Expr? = null
+        if (!check(TokenType.SEMICOLON)) {
+            condition = expression()
+        }
+
+        var increment: Expr? = null
+        if (!check(TokenType.RIGHT_PAREN)) {
+            increment = expression()
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
+        var body = statement()
+        if (increment != null) {
+            body = Stmt.Block(
+                listOf(
+                    body,
+                    Stmt.Expression(increment)
+                )
+            )
+        }
+
+        if (condition == null) condition = Expr.Literal(true)
+        body = While(condition, body)
+
+        if (initializer != null) {
+            body = Stmt.Block(listOf(initializer, body))
+        }
+        return body
     }
 
     private fun ifStatement(): Stmt.If {
@@ -229,4 +271,5 @@ class Parser(private val tokens: List<Token>) {
     private fun peek(): Token = tokens[current]
     private fun previous(): Token = tokens[current - 1]
     private fun advance() = current++
+    private fun check(tokenType: TokenType) = peek().type == tokenType
 }
