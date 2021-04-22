@@ -8,6 +8,7 @@ sealed class Expr {
         fun visitLiteralExpr(expr: Literal): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
+        fun visitLogicalExpr(expr: Logical): R
     }
     data class Assign(
         val name: Token,
@@ -42,6 +43,13 @@ sealed class Expr {
         val name: Token
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVariableExpr(this)
+    }
+    data class Logical(
+        val left: Expr,
+        val operator: Token,
+        val right: Expr
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitLogicalExpr(this)
     }
 
     abstract fun <R> accept(visitor: Visitor<R>): R

@@ -4,6 +4,7 @@ sealed class Stmt {
     interface Visitor<R> {
         fun visitExpressionStmt(stmt: Expression): R
         fun visitIfStmt(stmt: If): R
+        fun visitWhileStmt(stmt: While): R
         fun visitPrintStmt(stmt: Print): R
         fun visitBlockStmt(stmt: Block): R
         fun visitVarStmt(stmt: Var): R
@@ -19,6 +20,12 @@ sealed class Stmt {
         val elseBranch: Stmt?
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitIfStmt(this)
+    }
+    data class While(
+        val condition: Expr,
+        val body: Stmt
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitWhileStmt(this)
     }
     data class Print(
         val expression: Expr

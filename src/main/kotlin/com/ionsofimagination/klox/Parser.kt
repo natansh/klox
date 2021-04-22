@@ -40,6 +40,8 @@ class Parser(private val tokens: List<Token>) {
             return Stmt.Block(block())
         } else if (match(TokenType.IF)) {
             ifStatement()
+        } else if (match(TokenType.WHILE)) {
+            whileStatement()
         } else {
             expressionStatement()
         }
@@ -52,6 +54,14 @@ class Parser(private val tokens: List<Token>) {
         val thenStatement = statement()
         var elseStatement: Stmt? = if (match(TokenType.ELSE)) { statement() } else null
         return Stmt.If(condition, thenStatement, elseStatement)
+    }
+
+    private fun whileStatement(): Stmt.While {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after while.")
+        val condition = expression()
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+        val body = statement()
+        return Stmt.While(condition, body)
     }
 
     private fun printStatement(): Stmt.Print {
@@ -81,17 +91,34 @@ class Parser(private val tokens: List<Token>) {
         return assignment()
     }
 
+
     private fun assignment(): Expr {
-        val expr = equality()
+        val expr = logicOr()
         if (match(TokenType.EQUAL)) {
             val equals = previous()
-            val value = assignment()
+            val value = logicOr()
 
             if (expr is Expr.Variable) {
                 val name = expr.name
                 return Expr.Assign(name, value)
             }
             error(equals, "Invalid assignment target.")
+        }
+        return expr
+    }
+
+    private fun logicOr(): Expr {
+        var expr = logicAnd()
+        while (match(TokenType.OR))  {
+            expr = Expr.Logical(expr, previous(), logicAnd())
+        }
+        return expr
+    }
+
+    private fun logicAnd(): Expr {
+        var expr = equality()
+        while (match(TokenType.AND))  {
+            expr = Expr.Logical(expr, previous(), equality())
         }
         return expr
     }

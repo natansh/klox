@@ -1,6 +1,5 @@
 package com.ionsofimagination.klox
 
-import java.time.temporal.TemporalAdjusters.previous
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -182,6 +181,22 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             }
         } finally {
             this.environment = previous
+        }
+    }
+
+    override fun visitLogicalExpr(expr: Expr.Logical): Any? {
+        val left = evaluate(expr.left)
+        if (expr.operator.type === TokenType.OR) {
+            if (isTruthy(left)) return left
+        } else {
+            if (!isTruthy(left)) return left
+        }
+        return evaluate(expr.right)
+    }
+
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy((stmt.condition))) {
+            execute(stmt.body)
         }
     }
 }
