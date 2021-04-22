@@ -152,4 +152,8 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         val value = stmt.initializer?.let { evaluate(it) }
         environment.define(stmt.name.lexeme, value)
     }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        TODO("Not yet implemented")
+    }
 }
