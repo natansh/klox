@@ -64,6 +64,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.SEMICOLON)) {
             condition = expression()
         }
+        consume(TokenType.SEMICOLON, "Expect ';' after condition")
 
         var increment: Expr? = null
         if (!check(TokenType.RIGHT_PAREN)) {

@@ -195,7 +195,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitWhileStmt(stmt: Stmt.While) {
-        while (isTruthy((stmt.condition))) {
+        while (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body)
         }
     }
