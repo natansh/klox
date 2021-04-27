@@ -199,4 +199,21 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             execute(stmt.body)
         }
     }
+
+    override fun visitCallExpr(expr: Expr.Call): Any? {
+        val callee = evaluate(expr.callee)
+        val arguments = expr.arguments.map { evaluate(it) }
+        if (callee is LoxCallable) {
+            if (arguments.size != callee.arity()) {
+                throw RuntimeError(
+                    expr.paren, "Expected " +
+                            callee.arity().toString() + " arguments but got " +
+                            arguments.size.toString() + "."
+                )
+            }
+            return callee.call(this, arguments)
+        } else {
+            throw RuntimeError(expr.paren, "Can only call functions and classes")
+        }
+    }
 }

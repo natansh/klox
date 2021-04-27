@@ -32,6 +32,10 @@ class AstPrinter: Expr.Visitor<String> {
     override fun visitLogicalExpr(expr: Expr.Logical): String {
         TODO("Not yet implemented")
     }
+
+    override fun visitCallExpr(expr: Expr.Call): String {
+        TODO("Not yet implemented")
+    }
 }
 
 // Temporary hack to test out AST Printing

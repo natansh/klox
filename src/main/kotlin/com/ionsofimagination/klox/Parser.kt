@@ -6,10 +6,10 @@ import java.util.*
 
 class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
-    var current: Int = 0
+    private var current: Int = 0
 
     fun parse(): List<Stmt> {
-        var statements: MutableList<Stmt> = mutableListOf()
+        val statements: MutableList<Stmt> = mutableListOf()
         while (!isAtEnd()) {
             declaration()?.let { statements.add(it) }
         }
@@ -53,7 +53,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun forStatement(): Stmt {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
         val initializer: Stmt? = when {
             match(TokenType.SEMICOLON) ->  null
             match(TokenType.VAR) ->  varDeclaration()
@@ -95,16 +95,16 @@ class Parser(private val tokens: List<Token>) {
         val condition = expression()
         consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
         val thenStatement = statement()
-        var elseStatement: Stmt? = if (match(TokenType.ELSE)) { statement() } else null
+        val elseStatement: Stmt? = if (match(TokenType.ELSE)) { statement() } else null
         return Stmt.If(condition, thenStatement, elseStatement)
     }
 
-    private fun whileStatement(): Stmt.While {
+    private fun whileStatement(): While {
         consume(TokenType.LEFT_PAREN, "Expect '(' after while.")
         val condition = expression()
         consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
         val body = statement()
-        return Stmt.While(condition, body)
+        return While(condition, body)
     }
 
     private fun printStatement(): Stmt.Print {
@@ -195,6 +195,7 @@ class Parser(private val tokens: List<Token>) {
         }
         return expr
     }
+
     private fun factor(): Expr {
         var expr = unary()
         while(match(TokenType.SLASH, TokenType.STAR)) {
@@ -204,12 +205,42 @@ class Parser(private val tokens: List<Token>) {
         }
         return expr
     }
+
     private fun unary(): Expr =
         if(match(TokenType.BANG, TokenType.MINUS)) {
             Expr.Unary(previous(), unary())
         } else {
-            primary()
+            call()
         }
+
+    private fun call(): Expr {
+        var expr = primary()
+        while (true) {
+            if (match(TokenType.LEFT_PAREN)) {
+                expr = finishCall(expr)
+            } else {
+                break
+            }
+        }
+        return expr
+    }
+
+    private fun finishCall(callee: Expr): Expr {
+        val arguments: MutableList<Expr> = ArrayList()
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (arguments.size >= 255) {
+                    error(peek(), "Cannot have more than 255 arguments.")
+                }
+                arguments.add(expression())
+            } while (match(TokenType.COMMA))
+        }
+        val paren = consume(
+            TokenType.RIGHT_PAREN,
+            "Expect ')' after arguments."
+        )
+        return Expr.Call(callee, paren, arguments)
+    }
 
     private fun primary(): Expr {
         val token = peek()
@@ -254,8 +285,8 @@ class Parser(private val tokens: List<Token>) {
                 TokenType.WHILE,
                 TokenType.PRINT,
                 TokenType.RETURN -> return
+                else -> advance()
             }
-            advance()
         }
     }
 

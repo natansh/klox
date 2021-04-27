@@ -17,6 +17,7 @@ class GenerateAst {
             defineAst(outputDir, "Expr", listOf(
                 "Assign: Token name, Expr value",
                 "Binary: Expr left, Token operator, Expr right",
+                "Call: Expr callee, Token paren, List<Expr> arguments", // The `paren` token is used for reporting runtime errors caused by the function call.
                 "Grouping: Expr expression",
                 // Using "Any?" instead of "Object" in Kotlin.
                 "Literal: Any? value",
