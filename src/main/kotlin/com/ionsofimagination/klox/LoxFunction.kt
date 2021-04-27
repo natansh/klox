@@ -5,7 +5,11 @@ class LoxFunction(private val declaration: Stmt.Function): LoxCallable {
         // Each function call gets its own environment. Otherwise, recursion would break.
         val environment = Environment(interpreter.globals)
         declaration.params.zip(arguments) { token, value -> environment.define(token.lexeme, value) }
-        interpreter.executeBlock(declaration.body, environment)
+        try {
+            interpreter.executeBlock(declaration.body, environment)
+        } catch (returnValue: Return) {
+            return returnValue.value
+        }
         return null
     }
 

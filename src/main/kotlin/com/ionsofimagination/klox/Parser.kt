@@ -1,5 +1,6 @@
 package com.ionsofimagination.klox
 
+import com.ionsofimagination.klox.Stmt.Return
 import com.ionsofimagination.klox.Stmt.While
 import java.util.*
 
@@ -69,9 +70,21 @@ class Parser(private val tokens: List<Token>) {
             whileStatement()
         } else if (match(TokenType.FOR)) {
             forStatement()
+        } else if (match(TokenType.RETURN)) {
+            returnStatement()
         } else {
             expressionStatement()
         }
+    }
+
+    private fun returnStatement(): Stmt {
+        val keyword = previous()
+        var value: Expr? = null
+        if (!check(TokenType.SEMICOLON)) {
+            value = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' after return value.")
+        return Return(keyword, value)
     }
 
     private fun forStatement(): Stmt {

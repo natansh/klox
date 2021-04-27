@@ -8,6 +8,7 @@ sealed class Stmt {
         fun visitWhileStmt(stmt: While): R
         fun visitPrintStmt(stmt: Print): R
         fun visitBlockStmt(stmt: Block): R
+        fun visitReturnStmt(stmt: Return): R
         fun visitVarStmt(stmt: Var): R
     }
     data class Expression(
@@ -44,6 +45,12 @@ sealed class Stmt {
         val statements: List<Stmt>
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBlockStmt(this)
+    }
+    data class Return(
+        val keyword: Token,
+        val value: Expr?
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitReturnStmt(this)
     }
     data class Var(
         val name: Token,

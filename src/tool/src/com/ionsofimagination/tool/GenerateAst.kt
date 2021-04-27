@@ -32,11 +32,12 @@ class GenerateAst {
                 "While: Expr condition, Stmt body",
                 "Print: Expr expression",
                 "Block: List<Stmt> statements",
+                "Return: Token keyword, Expr? value", // `keyword` token used for error reporting
                 "Var: Token name, Expr? initializer"
             ))
         }
 
-        private val indent = "    "
+        private const val indent = "    "
 
         // The types are still defined Java-style, but are converted into Kotlin code through string manipulation.
         fun defineAst(outputDir: String, baseName: String, types: List<String>) {

@@ -43,7 +43,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         if (obj is Double) {
             val text = obj.toString()
             if (text.endsWith(".0")) {
-               return text.substring(0, endIndex = text.length - 2)
+                return text.substring(0, endIndex = text.length - 2)
             }
             return text
         }
@@ -240,4 +240,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     override fun visitFunctionStmt(stmt: Stmt.Function) {
         environment.define(stmt.name.lexeme, LoxFunction(stmt))
     }
+
+    override fun visitReturnStmt(stmt: Stmt.Return) =
+        throw Return(stmt.value?.let { evaluate(it) })
 }
