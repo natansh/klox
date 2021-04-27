@@ -238,7 +238,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        environment.define(stmt.name.lexeme, LoxFunction(stmt))
+        environment.define(stmt.name.lexeme, LoxFunction(stmt, environment))
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) =

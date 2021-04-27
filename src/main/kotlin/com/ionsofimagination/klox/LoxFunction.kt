@@ -1,9 +1,9 @@
 package com.ionsofimagination.klox
 
-class LoxFunction(private val declaration: Stmt.Function): LoxCallable {
+class LoxFunction(private val declaration: Stmt.Function, private val closure: Environment): LoxCallable {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
         // Each function call gets its own environment. Otherwise, recursion would break.
-        val environment = Environment(interpreter.globals)
+        val environment = Environment(closure)
         declaration.params.zip(arguments) { token, value -> environment.define(token.lexeme, value) }
         try {
             interpreter.executeBlock(declaration.body, environment)
