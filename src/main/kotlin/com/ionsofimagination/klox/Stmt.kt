@@ -3,6 +3,7 @@ package com.ionsofimagination.klox
 sealed class Stmt {
     interface Visitor<R> {
         fun visitExpressionStmt(stmt: Expression): R
+        fun visitFunctionStmt(stmt: Function): R
         fun visitIfStmt(stmt: If): R
         fun visitWhileStmt(stmt: While): R
         fun visitPrintStmt(stmt: Print): R
@@ -13,6 +14,13 @@ sealed class Stmt {
         val expression: Expr
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitExpressionStmt(this)
+    }
+    data class Function(
+        val name: Token,
+        val params: List<Token>,
+        val body: List<Stmt>
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitFunctionStmt(this)
     }
     data class If(
         val expression: Expr,

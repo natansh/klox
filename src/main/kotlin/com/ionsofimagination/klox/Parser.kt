@@ -18,12 +18,34 @@ class Parser(private val tokens: List<Token>) {
 
     private fun declaration(): Stmt? {
         try {
+            if (match(TokenType.FUN)) return function("function");
             if (match(TokenType.VAR)) return varDeclaration()
             return statement()
         } catch (error: ParseError) {
             synchronize()
             return null
         }
+    }
+
+    // `kind` param allows `function` to be reused later for parsing methods inside classes.
+    private fun function(kind: String): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
+        consume(TokenType.LEFT_BRACE, "Expect '(' after function name.")
+        val parameters = mutableListOf<Token>()
+        // Check the 0-parameter case.
+        if (!check(TokenType.RIGHT_BRACE)) {
+            do {
+                if (parameters.size >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+                parameters.add(consume(TokenType.IDENTIFIER, "Expected identifier as a param name"))
+            } while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_BRACE, "Expect ')' after parameters.")
+        // Calling `block()` assumes that the left brace has already been parsed. Hence, parse the left brace beforehand.
+        consume(TokenType.LEFT_BRACE, "Expect '{' before $kind body.")
+        val body = block()
+        return Stmt.Function(name, parameters, body)
     }
 
     private fun varDeclaration(): Stmt {

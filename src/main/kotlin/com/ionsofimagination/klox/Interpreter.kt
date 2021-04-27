@@ -237,4 +237,8 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             throw RuntimeError(expr.paren, "Can only call functions and classes")
         }
     }
+
+    override fun visitFunctionStmt(stmt: Stmt.Function) {
+        TODO("Not yet implemented")
+    }
 }
