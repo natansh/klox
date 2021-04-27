@@ -6,7 +6,7 @@ import kotlin.contracts.contract
 class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     // Why keep global as a separate variable? So that native/foreign functions can be added directly to the global
     // environment.
-    private val globals = Environment()
+    val globals = Environment()
     private var environment = globals
 
     init {
@@ -16,8 +16,8 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             }
 
             override fun call(
-                interpreter: Interpreter?,
-                arguments: List<Any?>?
+                interpreter: Interpreter,
+                arguments: List<Any?>
             ): Any? {
                 return System.currentTimeMillis().toDouble() / 1000.0
             }
@@ -193,7 +193,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         executeBlock(stmt.expression, Environment(environment))
     }
 
-    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+    fun executeBlock(statements: List<Stmt>, environment: Environment) {
         val previous = this.environment
         try {
             this.environment = environment
@@ -239,6 +239,6 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        TODO("Not yet implemented")
+        environment.define(stmt.name.lexeme, LoxFunction(stmt))
     }
 }
