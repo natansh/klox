@@ -189,8 +189,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
-        // TODO: This should be statements.
-        executeBlock(stmt.expression, Environment(environment))
+        executeBlock(stmt.statements, Environment(environment))
     }
 
     fun executeBlock(statements: List<Stmt>, environment: Environment) {

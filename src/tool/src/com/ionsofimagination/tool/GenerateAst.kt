@@ -31,7 +31,7 @@ class GenerateAst {
                 "If: Expr expression, Stmt thenBranch, Stmt? elseBranch",
                 "While: Expr condition, Stmt body",
                 "Print: Expr expression",
-                "Block: List<Stmt> expression",
+                "Block: List<Stmt> statements",
                 "Var: Token name, Expr? initializer"
             ))
         }

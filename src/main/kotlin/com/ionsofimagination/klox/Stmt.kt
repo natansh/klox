@@ -41,7 +41,7 @@ sealed class Stmt {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitPrintStmt(this)
     }
     data class Block(
-        val expression: List<Stmt>
+        val statements: List<Stmt>
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBlockStmt(this)
     }
