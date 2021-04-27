@@ -3,9 +3,30 @@ package com.ionsofimagination.klox
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-
 class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
-    private var environment = Environment()
+    // Why keep global as a separate variable? So that native/foreign functions can be added directly to the global
+    // environment.
+    private val globals = Environment()
+    private var environment = globals
+
+    init {
+        globals.define("clock", object : LoxCallable {
+            override fun arity(): Int {
+                return 0
+            }
+
+            override fun call(
+                interpreter: Interpreter?,
+                arguments: List<Any?>?
+            ): Any? {
+                return System.currentTimeMillis().toDouble() / 1000.0
+            }
+
+            override fun toString(): String {
+                return "<native fn>"
+            }
+        })
+    }
 
     fun interpret(statements: List<Stmt>) {
         try {
