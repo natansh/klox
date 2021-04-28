@@ -2,9 +2,14 @@ package com.ionsofimagination.klox
 
 import java.util.*
 
+private enum class FunctionType {
+    NONE, FUNCTION
+}
 
 class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.Visitor<Unit> {
     private val scopes = Stack<MutableMap<String, Boolean>>()
+    private var currentFunction = FunctionType.NONE
+
     override fun visitBlockStmt(stmt: Stmt.Block) {
         beginScope()
         resolve(stmt.statements)
@@ -29,16 +34,20 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         resolveLocal(expr, expr.name);
     }
 
-    private fun declare(token: Token) {
+    private fun declare(name: Token) {
         if (scopes.isEmpty()) return
+        val scope = scopes.peek()
+        if (scope.containsKey(name.lexeme)) {
+            Klox.error(name, "Already a variable with this name in this scope.");
+        }
         // By marking as "false" we say that the resolution is not done yet.
-        scopes.peek()[token.lexeme] = false
+        scope[name.lexeme] = false
     }
 
-    private fun define(token: Token) {
+    private fun define(name: Token) {
         if (scopes.isEmpty()) return
         // Once we define the variable, we're ready.
-        scopes.peek()[token.lexeme] = true
+        scopes.peek()[name.lexeme] = true
     }
 
     private fun beginScope() {
@@ -109,10 +118,12 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
     override fun visitFunctionStmt(stmt: Stmt.Function) {
         declare(stmt.name)
         define(stmt.name)
-        resolveFunction(stmt)
+        resolveFunction(stmt, FunctionType.FUNCTION)
     }
 
-    private fun resolveFunction(stmt: Stmt.Function) {
+    private fun resolveFunction(stmt: Stmt.Function, type: FunctionType) {
+        val enclosingFunction = currentFunction
+        currentFunction = type
         beginScope()
         stmt.params.forEach {
             declare(it)
@@ -120,6 +131,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         }
         resolve(stmt.body)
         endScope()
+        currentFunction = enclosingFunction
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
@@ -140,6 +152,9 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
+        if (currentFunction == FunctionType.NONE) {
+            Klox.error(stmt.keyword, "Can't return from top-level code.");
+        }
         stmt.value?.let { resolve(it) }
     }
 }
