@@ -28,17 +28,17 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         if (!scopes.isEmpty() &&
             scopes.peek()[expr.name.lexeme] == false) {
             Klox.error(expr.name,
-                "Can't read local variable in its own initializer.");
+                "Can't read local variable in its own initializer.")
         }
 
-        resolveLocal(expr, expr.name);
+        resolveLocal(expr, expr.name)
     }
 
     private fun declare(name: Token) {
         if (scopes.isEmpty()) return
         val scope = scopes.peek()
         if (scope.containsKey(name.lexeme)) {
-            Klox.error(name, "Already a variable with this name in this scope.");
+            Klox.error(name, "Already a variable with this name in this scope.")
         }
         // By marking as "false" we say that the resolution is not done yet.
         scope[name.lexeme] = false
@@ -153,7 +153,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
         if (currentFunction == FunctionType.NONE) {
-            Klox.error(stmt.keyword, "Can't return from top-level code.");
+            Klox.error(stmt.keyword, "Can't return from top-level code.")
         }
         stmt.value?.let { resolve(it) }
     }

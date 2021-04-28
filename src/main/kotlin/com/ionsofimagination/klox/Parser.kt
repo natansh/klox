@@ -19,7 +19,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun declaration(): Stmt? {
         try {
-            if (match(TokenType.FUN)) return function("function");
+            if (match(TokenType.FUN)) return function("function")
             if (match(TokenType.VAR)) return varDeclaration()
             return statement()
         } catch (error: ParseError) {
@@ -37,7 +37,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 255) {
-                    error(peek(), "Can't have more than 255 parameters.");
+                    error(peek(), "Can't have more than 255 parameters.")
                 }
                 parameters.add(consume(TokenType.IDENTIFIER, "Expected identifier as a param name"))
             } while (match(TokenType.COMMA))
