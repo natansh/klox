@@ -144,7 +144,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun printStatement(): Stmt.Print {
         val value = expression()
-        consume(TokenType.SEMICOLON, "Expected ';' after value")
+        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Print(value)
     }
 
@@ -161,7 +161,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun expressionStatement(): Stmt.Expression {
         val value = expression()
-        consume(TokenType.SEMICOLON, "Expected ';' after value")
+        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Expression(value)
     }
 
@@ -169,12 +169,11 @@ class Parser(private val tokens: List<Token>) {
         return assignment()
     }
 
-
     private fun assignment(): Expr {
         val expr = logicOr()
         if (match(TokenType.EQUAL)) {
             val equals = previous()
-            val value = logicOr()
+            val value = assignment()
 
             if (expr is Expr.Variable) {
                 val name = expr.name
@@ -265,7 +264,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (arguments.size >= 255) {
-                    error(peek(), "Cannot have more than 255 arguments.")
+                    error(peek(), "Can't have more than 255 arguments.")
                 }
                 arguments.add(expression())
             } while (match(TokenType.COMMA))
@@ -280,8 +279,8 @@ class Parser(private val tokens: List<Token>) {
     private fun primary(): Expr {
         val token = peek()
         return when {
-            match(TokenType.NIL) -> Expr.Literal(false)
             match(TokenType.TRUE) -> Expr.Literal(true)
+            match(TokenType.FALSE) -> Expr.Literal(false)
             match(TokenType.NIL) -> Expr.Literal(null)
             match(TokenType.NUMBER) -> Expr.Literal(token.literal)
             match(TokenType.STRING) -> Expr.Literal(token.literal)

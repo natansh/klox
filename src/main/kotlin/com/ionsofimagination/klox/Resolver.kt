@@ -38,7 +38,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         if (scopes.isEmpty()) return
         val scope = scopes.peek()
         if (scope.containsKey(name.lexeme)) {
-            Klox.error(name, "Already a variable with this name in this scope.")
+            Klox.error(name, "Already variable with this name in this scope.")
         }
         // By marking as "false" we say that the resolution is not done yet.
         scope[name.lexeme] = false

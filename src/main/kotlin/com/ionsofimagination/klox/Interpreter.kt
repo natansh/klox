@@ -253,7 +253,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             }
             return callee.call(this, arguments)
         } else {
-            throw RuntimeError(expr.paren, "Can only call functions and classes")
+            throw RuntimeError(expr.paren, "Can only call functions and classes.")
         }
     }
 
