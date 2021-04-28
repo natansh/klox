@@ -285,8 +285,10 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     override fun visitSetExpr(expr: Expr.Set): Any? {
         val obj = evaluate(expr.obj)
+        val value = evaluate(expr.value)
         if (obj is LoxInstance) {
-            obj.set(expr.name, evaluate(expr.value))
+            obj.set(expr.name, value)
         }
+        return value
     }
 }
