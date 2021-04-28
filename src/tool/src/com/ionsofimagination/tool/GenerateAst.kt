@@ -8,22 +8,23 @@ import kotlin.system.exitProcess
 class GenerateAst {
     companion object {
         fun main(args: Array<String>) {
-            val hello: List<String> = listOf()
             if (args.size != 1) {
                 System.err.println("Usage: generate_ast <output_directory>")
                 exitProcess(64)
             }
             val outputDir = args[0]
             defineAst(outputDir, "Expr", listOf(
-                "Assign: Token name, Expr value",
                 "Binary: Expr left, Token operator, Expr right",
                 "Call: Expr callee, Token paren, List<Expr> arguments", // The `paren` token is used for reporting runtime errors caused by the function call.
+                "Get: Expr obj, Token name",
                 "Grouping: Expr expression",
                 // Using "Any?" instead of "Object" in Kotlin.
                 "Literal: Any? value",
+                "Assign: Token name, Expr value",
+                "Logical: Expr left, Token operator, Expr right",
+                "Set: Expr obj, Token name, Expr value",
                 "Unary: Token operator, Expr right",
                 "Variable: Token name",
-                "Logical: Expr left, Token operator, Expr right",
             ))
             defineAst(outputDir, "Stmt", listOf(
                 "Expression: Expr expression",
@@ -33,7 +34,8 @@ class GenerateAst {
                 "Print: Expr expression",
                 "Block: List<Stmt> statements",
                 "Return: Token keyword, Expr? value", // `keyword` token used for error reporting
-                "Var: Token name, Expr? initializer"
+                "Var: Token name, Expr? initializer",
+                "Class: Token name, List<Stmt.Function> methods"
             ))
         }
 

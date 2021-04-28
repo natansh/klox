@@ -1,0 +1,22 @@
+package com.ionsofimagination.klox
+
+class LoxInstance(private val klass: LoxClass) {
+    private val fields = HashMap<String, Any?>()
+
+    override fun toString(): String {
+        return klass.name + " instance"
+    }
+
+    fun get(name: Token): Any? {
+        if (fields.containsKey(name.lexeme)) {
+            return fields[name.lexeme]
+        }
+        // Theoretically, nil can be returned here. But more often than not, it's a bug when we try to access a field
+        // that we haven't ever set.
+        throw RuntimeError(name, "Undefined property '" + name.lexeme.toString() + "'.")
+    }
+
+    fun set(name: Token, value: Any?) {
+        fields[name.lexeme] = value
+    }
+}

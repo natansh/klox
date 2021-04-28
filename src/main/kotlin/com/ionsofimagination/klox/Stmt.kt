@@ -10,6 +10,7 @@ sealed class Stmt {
         fun visitBlockStmt(stmt: Block): R
         fun visitReturnStmt(stmt: Return): R
         fun visitVarStmt(stmt: Var): R
+        fun visitClassStmt(stmt: Class): R
     }
     class Expression(
         val expression: Expr
@@ -57,6 +58,12 @@ sealed class Stmt {
         val initializer: Expr?
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVarStmt(this)
+    }
+    class Class(
+        val name: Token,
+        val methods: List<Stmt.Function>
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitClassStmt(this)
     }
 
     abstract fun <R> accept(visitor: Visitor<R>): R

@@ -263,4 +263,30 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     override fun visitReturnStmt(stmt: Stmt.Return) =
         throw Return(stmt.value?.let { evaluate(it) })
+
+    override fun visitClassStmt(stmt: Stmt.Class) {
+        // Do we need to define and assign separately? There might be a reason for this.
+        environment.define(stmt.name.lexeme, null)
+        val klass = LoxClass(stmt.name.lexeme)
+        environment.assign(stmt.name, klass)
+        stmt.name
+        for (method in stmt.methods) {
+            method.accept(this)
+        }
+    }
+
+    override fun visitGetExpr(expr: Expr.Get): Any? {
+        val obj = evaluate(expr.obj)
+        if (obj is LoxInstance) {
+            return obj.get(expr.name)
+        }
+        throw RuntimeError(expr.name, "Only instances have properties.")
+    }
+
+    override fun visitSetExpr(expr: Expr.Set): Any? {
+        val obj = evaluate(expr.obj)
+        if (obj is LoxInstance) {
+            obj.set(expr.name, evaluate(expr.value))
+        }
+    }
 }
