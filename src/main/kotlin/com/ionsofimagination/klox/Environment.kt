@@ -26,4 +26,23 @@ class Environment(private val enclosing: Environment? = null) {
         if (enclosing != null) return enclosing.get(name)
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
     }
+
+    fun getAt(distance: Int, name: Token): Any? {
+        // Why take from values and not use the `get` on environment? Because we want to be
+        // specific about which environment we take it from.
+        val value = ancestor(distance)?.values?.get(name.lexeme)
+        return value
+    }
+
+    fun assignAt(value: Any?, name: Token, distance: Int) {
+        ancestor(distance)?.values?.put(name.lexeme, value)
+    }
+
+    private fun ancestor(distance: Int): Environment? {
+        var env: Environment? = this
+        for (i in 0 until distance) {
+            env = env?.enclosing
+        }
+        return env
+    }
 }

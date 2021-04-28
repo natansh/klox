@@ -11,48 +11,48 @@ sealed class Expr {
         fun visitVariableExpr(expr: Variable): R
         fun visitLogicalExpr(expr: Logical): R
     }
-    data class Assign(
+    class Assign(
         val name: Token,
         val value: Expr
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitAssignExpr(this)
     }
-    data class Binary(
+    class Binary(
         val left: Expr,
         val operator: Token,
         val right: Expr
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBinaryExpr(this)
     }
-    data class Call(
+    class Call(
         val callee: Expr,
         val paren: Token,
         val arguments: List<Expr>
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitCallExpr(this)
     }
-    data class Grouping(
+    class Grouping(
         val expression: Expr
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitGroupingExpr(this)
     }
-    data class Literal(
+    class Literal(
         val value: Any?
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitLiteralExpr(this)
     }
-    data class Unary(
+    class Unary(
         val operator: Token,
         val right: Expr
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitUnaryExpr(this)
     }
-    data class Variable(
+    class Variable(
         val name: Token
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVariableExpr(this)
     }
-    data class Logical(
+    class Logical(
         val left: Expr,
         val operator: Token,
         val right: Expr

@@ -74,7 +74,7 @@ class GenerateAst {
         private fun defineType(writer: PrintWriter, baseName: String, className: String, fieldList: String) {
             val fields = fieldList.split(", ")
             writer.apply {
-                println("${indent}data class $className(")
+                println("${indent}class $className(")
                 println(fields.joinToString(",\n") { field ->
                     val fieldType = field.split(" ")[0].trim()
                     val fieldName = field.split(" ")[1].trim()
