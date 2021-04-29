@@ -1,6 +1,6 @@
 package com.ionsofimagination.klox
 
-class LoxClass(val name: String, methods: Map<String, LoxFunction>): LoxCallable {
+class LoxClass(val name: String, val superclass: LoxClass?, methods: Map<String, LoxFunction>): LoxCallable {
     private val _methods: MutableMap<String, LoxFunction>
     val methods: Map<String, LoxFunction>
         get() = _methods

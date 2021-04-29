@@ -36,7 +36,8 @@ class GenerateAst {
                 "Block: List<Stmt> statements",
                 "Return: Token keyword, Expr? value", // `keyword` token used for error reporting
                 "Var: Token name, Expr? initializer",
-                "Class: Token name, List<Stmt.Function> methods"
+                // The grammar restricts the superclass clause to a single identifier, but at runtime, that identifier is evaluated as a variable access. Wrapping the name in an Expr.Variable early on in the parser gives us an object that the resolver can hang the resolution information off of.
+                "Class: Token name, Expr.Variable? superclass, List<Stmt.Function> methods"
             ))
         }
 

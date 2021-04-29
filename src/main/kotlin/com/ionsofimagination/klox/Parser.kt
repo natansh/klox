@@ -31,13 +31,18 @@ class Parser(private val tokens: List<Token>) {
 
     private fun classDeclaration(): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expect class name.")
+        var superclass: Expr.Variable? = null
+        if (match(TokenType.LESS)) {
+            consume(TokenType.IDENTIFIER, "Expect superclass name.")
+            superclass = Expr.Variable(previous())
+        }
         consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
         var methods = mutableListOf<Stmt.Function>()
         while (!isAtEnd() && !check(TokenType.RIGHT_BRACE)) {
             methods.add(function("method"))
         }
         consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
-        return Stmt.Class(name, methods)
+        return Stmt.Class(name, superclass, methods)
     }
 
     // `kind` param allows `function` to be reused later for parsing methods inside classes.

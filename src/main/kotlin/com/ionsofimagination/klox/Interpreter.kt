@@ -265,12 +265,24 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         throw Return(stmt.value?.let { evaluate(it) })
 
     override fun visitClassStmt(stmt: Stmt.Class) {
+        var superclass: LoxClass? = null
+        if (stmt.superclass != null) {
+            val value = evaluate(stmt.superclass)
+            if (value is LoxClass) {
+                superclass = value
+            } else {
+                throw RuntimeError(
+                    stmt.superclass.name,
+                    "Superclass must be a class."
+                )
+            }
+        }
         environment.define(stmt.name.lexeme, null)
         val methods = HashMap<String, LoxFunction>()
         for (method in stmt.methods) {
             methods[method.name.lexeme] = LoxFunction(method, environment, method.name.lexeme == "init")
         }
-        val klass = LoxClass(stmt.name.lexeme, methods)
+        val klass = LoxClass(stmt.name.lexeme, superclass, methods)
         environment.assign(stmt.name, klass)
     }
 

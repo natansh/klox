@@ -173,6 +173,12 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         currentClass = ClassType.CLASS
         declare(stmt.name)
         define(stmt.name)
+        if (stmt.superclass != null && stmt.name.lexeme == stmt.superclass.name.lexeme) {
+            Klox.error(stmt.superclass.name, "A class can't inherit from itself.");
+        }
+        if (stmt.superclass != null) {
+            resolve(stmt.superclass)
+        }
         beginScope()
         scopes.peek()["this"] = true
         for (method in stmt.methods) {
