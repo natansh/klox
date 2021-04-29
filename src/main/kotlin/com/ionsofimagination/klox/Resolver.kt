@@ -31,9 +31,12 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
 
     override fun visitVariableExpr(expr: Expr.Variable) {
         if (!scopes.isEmpty() &&
-            scopes.peek()[expr.name.lexeme] == false) {
-            Klox.error(expr.name,
-                "Can't read local variable in its own initializer.")
+            scopes.peek()[expr.name.lexeme] == false
+        ) {
+            Klox.error(
+                expr.name,
+                "Can't read local variable in its own initializer."
+            )
         }
 
         resolveLocal(expr, expr.name)
@@ -162,7 +165,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         }
         stmt.value?.let {
             if (currentFunction == FunctionType.INITIALIZER) {
-                Klox.error(stmt.keyword, "Can't return a value from an initializer.");
+                Klox.error(stmt.keyword, "Can't return a value from an initializer.")
             }
             resolve(it)
         }
@@ -174,7 +177,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         declare(stmt.name)
         define(stmt.name)
         if (stmt.superclass != null && stmt.name.lexeme == stmt.superclass.name.lexeme) {
-            Klox.error(stmt.superclass.name, "A class can't inherit from itself.");
+            Klox.error(stmt.superclass.name, "A class can't inherit from itself.")
         }
         if (stmt.superclass != null) {
             resolve(stmt.superclass)
@@ -211,7 +214,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
 
     override fun visitThisExpr(expr: Expr.This) {
         if (currentClass == ClassType.NONE) {
-            Klox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            Klox.error(expr.keyword, "Can't use 'this' outside of a class.")
             return
         }
         resolveLocal(expr, expr.keyword)
@@ -219,9 +222,9 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
 
     override fun visitSuperExpr(expr: Expr.Super) {
         if (currentClass == ClassType.NONE) {
-            Klox.error(expr.keyword, "Can't use 'super' outside of a class.");
+            Klox.error(expr.keyword, "Can't use 'super' outside of a class.")
         } else if (currentClass != ClassType.SUBCLASS) {
-            Klox.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+            Klox.error(expr.keyword, "Can't use 'super' in a class with no superclass.")
         }
         resolveLocal(expr, expr.keyword)
     }

@@ -64,11 +64,13 @@ class Scanner(val source: String) {
     private fun isAlphaNumeric(c: Char): Boolean = isAlpha(c) || isDigit(c)
 
     private fun identifier() {
-        while(isAlphaNumeric(peek())) advance()
+        while (isAlphaNumeric(peek())) advance()
         val text = source.substring(start, current)
         // Check if reserved keyword.
         var type = keywords[text]
-        if (type == null) { type = TokenType.IDENTIFIER }
+        if (type == null) {
+            type = TokenType.IDENTIFIER
+        }
         addToken(type)
     }
 

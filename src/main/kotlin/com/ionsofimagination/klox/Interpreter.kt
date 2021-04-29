@@ -4,7 +4,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 
-class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     // Why keep global as a separate variable? So that native/foreign functions can be added directly to the global
     // environment.
     val globals = Environment()

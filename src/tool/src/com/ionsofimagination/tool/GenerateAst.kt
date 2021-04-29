@@ -13,33 +13,37 @@ class GenerateAst {
                 exitProcess(64)
             }
             val outputDir = args[0]
-            defineAst(outputDir, "Expr", listOf(
-                "Binary: Expr left, Token operator, Expr right",
-                "Call: Expr callee, Token paren, List<Expr> arguments", // The `paren` token is used for reporting runtime errors caused by the function call.
-                "Get: Expr obj, Token name",
-                "Grouping: Expr expression",
-                // Using "Any?" instead of "Object" in Kotlin.
-                "Literal: Any? value",
-                "Assign: Token name, Expr value",
-                "Logical: Expr left, Token operator, Expr right",
-                "Set: Expr obj, Token name, Expr value",
-                "This: Token keyword",
-                "Unary: Token operator, Expr right",
-                "Variable: Token name",
-                "Super: Token keyword, Token method",
-            ))
-            defineAst(outputDir, "Stmt", listOf(
-                "Expression: Expr expression",
-                "Function: Token name, List<Token> params, List<Stmt> body",
-                "If: Expr expression, Stmt thenBranch, Stmt? elseBranch",
-                "While: Expr condition, Stmt body",
-                "Print: Expr expression",
-                "Block: List<Stmt> statements",
-                "Return: Token keyword, Expr? value", // `keyword` token used for error reporting
-                "Var: Token name, Expr? initializer",
-                // The grammar restricts the superclass clause to a single identifier, but at runtime, that identifier is evaluated as a variable access. Wrapping the name in an Expr.Variable early on in the parser gives us an object that the resolver can hang the resolution information off of.
-                "Class: Token name, Expr.Variable? superclass, List<Stmt.Function> methods"
-            ))
+            defineAst(
+                outputDir, "Expr", listOf(
+                    "Binary: Expr left, Token operator, Expr right",
+                    "Call: Expr callee, Token paren, List<Expr> arguments", // The `paren` token is used for reporting runtime errors caused by the function call.
+                    "Get: Expr obj, Token name",
+                    "Grouping: Expr expression",
+                    // Using "Any?" instead of "Object" in Kotlin.
+                    "Literal: Any? value",
+                    "Assign: Token name, Expr value",
+                    "Logical: Expr left, Token operator, Expr right",
+                    "Set: Expr obj, Token name, Expr value",
+                    "This: Token keyword",
+                    "Unary: Token operator, Expr right",
+                    "Variable: Token name",
+                    "Super: Token keyword, Token method",
+                )
+            )
+            defineAst(
+                outputDir, "Stmt", listOf(
+                    "Expression: Expr expression",
+                    "Function: Token name, List<Token> params, List<Stmt> body",
+                    "If: Expr expression, Stmt thenBranch, Stmt? elseBranch",
+                    "While: Expr condition, Stmt body",
+                    "Print: Expr expression",
+                    "Block: List<Stmt> statements",
+                    "Return: Token keyword, Expr? value", // `keyword` token used for error reporting
+                    "Var: Token name, Expr? initializer",
+                    // The grammar restricts the superclass clause to a single identifier, but at runtime, that identifier is evaluated as a variable access. Wrapping the name in an Expr.Variable early on in the parser gives us an object that the resolver can hang the resolution information off of.
+                    "Class: Token name, Expr.Variable? superclass, List<Stmt.Function> methods"
+                )
+            )
         }
 
         private const val indent = "    "
@@ -73,6 +77,7 @@ class GenerateAst {
                     println("$indent${indent}fun visit$className$baseName(${baseName.toLowerCase()}: $className): R")
                 }
                 println("$indent}")
+                println()
             }
         }
 
@@ -86,9 +91,10 @@ class GenerateAst {
                     // To ensure proper indentation, indent by 8 spaces.
                     "$indent${indent}val $fieldName: $fieldType"
                 })
-                println("$indent): $baseName() {")
+                println("$indent) : $baseName() {")
                 println("$indent${indent}override fun <R> accept(visitor: Visitor<R>): R = visitor.visit$className$baseName(this)")
                 println("$indent}")
+                println()
             }
         }
     }

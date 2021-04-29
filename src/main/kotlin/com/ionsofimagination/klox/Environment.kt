@@ -16,12 +16,12 @@ class Environment(val enclosing: Environment? = null) {
             enclosing.assign(name, value)
             return
         }
-        throw RuntimeError( name, "Undefined variable '${name.lexeme}'." )
+        throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
     }
 
     fun get(name: Token): Any? {
         if (values.containsKey(name.lexeme)) {
-           return values[name.lexeme]
+            return values[name.lexeme]
         }
         if (enclosing != null) return enclosing.get(name)
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")

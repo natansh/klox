@@ -1,6 +1,6 @@
 package com.ionsofimagination.klox
 
-class AstPrinter: Expr.Visitor<String> {
+class AstPrinter : Expr.Visitor<String> {
     fun print(expr: Expr): String {
         return expr.accept(this)
     }

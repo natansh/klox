@@ -2,11 +2,11 @@ package com.ionsofimagination.klox
 
 import com.ionsofimagination.klox.Stmt.Return
 import com.ionsofimagination.klox.Stmt.While
-import java.util.*
 
 
 class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
+
     private var current: Int = 0
 
     fun parse(): List<Stmt> {
@@ -107,9 +107,9 @@ class Parser(private val tokens: List<Token>) {
     private fun forStatement(): Stmt {
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
         val initializer: Stmt? = when {
-            match(TokenType.SEMICOLON) ->  null
-            match(TokenType.VAR) ->  varDeclaration()
-            else ->  expressionStatement()
+            match(TokenType.SEMICOLON) -> null
+            match(TokenType.VAR) -> varDeclaration()
+            else -> expressionStatement()
         }
 
         var condition: Expr? = null
@@ -147,7 +147,9 @@ class Parser(private val tokens: List<Token>) {
         val condition = expression()
         consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
         val thenStatement = statement()
-        val elseStatement: Stmt? = if (match(TokenType.ELSE)) { statement() } else null
+        val elseStatement: Stmt? = if (match(TokenType.ELSE)) {
+            statement()
+        } else null
         return Stmt.If(condition, thenStatement, elseStatement)
     }
 
@@ -205,7 +207,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun logicOr(): Expr {
         var expr = logicAnd()
-        while (match(TokenType.OR))  {
+        while (match(TokenType.OR)) {
             expr = Expr.Logical(expr, previous(), logicAnd())
         }
         return expr
@@ -213,7 +215,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun logicAnd(): Expr {
         var expr = equality()
-        while (match(TokenType.AND))  {
+        while (match(TokenType.AND)) {
             expr = Expr.Logical(expr, previous(), equality())
         }
         return expr
@@ -231,7 +233,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun comparison(): Expr {
         var expr = term()
-        while(match(TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL)) {
+        while (match(TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL)) {
             val operator = previous()
             val right = term()
             expr = Expr.Binary(expr, operator, right)
@@ -241,7 +243,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun term(): Expr {
         var expr = factor()
-        while(match(TokenType.PLUS, TokenType.MINUS)) {
+        while (match(TokenType.PLUS, TokenType.MINUS)) {
             val operator = previous()
             val right = factor()
             expr = Expr.Binary(expr, operator, right)
@@ -251,7 +253,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun factor(): Expr {
         var expr = unary()
-        while(match(TokenType.SLASH, TokenType.STAR)) {
+        while (match(TokenType.SLASH, TokenType.STAR)) {
             val operator = previous()
             val right = unary()
             expr = Expr.Binary(expr, operator, right)
@@ -368,5 +370,6 @@ class Parser(private val tokens: List<Token>) {
         if (!isAtEnd()) current++
         return previous()
     }
+
     private fun check(tokenType: TokenType) = peek().type == tokenType
 }

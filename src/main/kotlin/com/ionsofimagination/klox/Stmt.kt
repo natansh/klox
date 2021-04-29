@@ -12,60 +12,70 @@ sealed class Stmt {
         fun visitVarStmt(stmt: Var): R
         fun visitClassStmt(stmt: Class): R
     }
+
     class Expression(
         val expression: Expr
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitExpressionStmt(this)
     }
+
     class Function(
         val name: Token,
         val params: List<Token>,
         val body: List<Stmt>
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitFunctionStmt(this)
     }
+
     class If(
         val expression: Expr,
         val thenBranch: Stmt,
         val elseBranch: Stmt?
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitIfStmt(this)
     }
+
     class While(
         val condition: Expr,
         val body: Stmt
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitWhileStmt(this)
     }
+
     class Print(
         val expression: Expr
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitPrintStmt(this)
     }
+
     class Block(
         val statements: List<Stmt>
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBlockStmt(this)
     }
+
     class Return(
         val keyword: Token,
         val value: Expr?
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitReturnStmt(this)
     }
+
     class Var(
         val name: Token,
         val initializer: Expr?
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVarStmt(this)
     }
+
     class Class(
         val name: Token,
         val superclass: Expr.Variable?,
         val methods: List<Stmt.Function>
-    ): Stmt() {
+    ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitClassStmt(this)
     }
+
 
     abstract fun <R> accept(visitor: Visitor<R>): R
 }

@@ -15,78 +15,91 @@ sealed class Expr {
         fun visitVariableExpr(expr: Variable): R
         fun visitSuperExpr(expr: Super): R
     }
+
     class Binary(
         val left: Expr,
         val operator: Token,
         val right: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitBinaryExpr(this)
     }
+
     class Call(
         val callee: Expr,
         val paren: Token,
         val arguments: List<Expr>
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitCallExpr(this)
     }
+
     class Get(
         val obj: Expr,
         val name: Token
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitGetExpr(this)
     }
+
     class Grouping(
         val expression: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitGroupingExpr(this)
     }
+
     class Literal(
         val value: Any?
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitLiteralExpr(this)
     }
+
     class Assign(
         val name: Token,
         val value: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitAssignExpr(this)
     }
+
     class Logical(
         val left: Expr,
         val operator: Token,
         val right: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitLogicalExpr(this)
     }
+
     class Set(
         val obj: Expr,
         val name: Token,
         val value: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitSetExpr(this)
     }
+
     class This(
         val keyword: Token
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitThisExpr(this)
     }
+
     class Unary(
         val operator: Token,
         val right: Expr
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitUnaryExpr(this)
     }
+
     class Variable(
         val name: Token
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVariableExpr(this)
     }
+
     class Super(
         val keyword: Token,
         val method: Token
-    ): Expr() {
+    ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitSuperExpr(this)
     }
+
 
     abstract fun <R> accept(visitor: Visitor<R>): R
 }

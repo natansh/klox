@@ -1,8 +1,10 @@
 package com.ionsofimagination.klox
 
-class LoxFunction(private val declaration: Stmt.Function,
-                  private val closure: Environment,
-                  private val isInitializer: Boolean): LoxCallable {
+class LoxFunction(
+    private val declaration: Stmt.Function,
+    private val closure: Environment,
+    private val isInitializer: Boolean
+) : LoxCallable {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
         // Each function call gets its own environment. Otherwise, recursion would break.
         val environment = Environment(closure)
@@ -10,7 +12,7 @@ class LoxFunction(private val declaration: Stmt.Function,
         try {
             interpreter.executeBlock(declaration.body, environment)
         } catch (returnValue: Return) {
-            if (isInitializer) return closure.getAt(0, "this");
+            if (isInitializer) return closure.getAt(0, "this")
             return returnValue.value
         }
         if (isInitializer) return closure.getAt(0, "this")
