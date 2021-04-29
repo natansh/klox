@@ -3,12 +3,17 @@ package com.ionsofimagination.klox
 import java.util.*
 
 private enum class FunctionType {
-    NONE, FUNCTION
+    NONE, FUNCTION, INITIALIZER, METHOD
+}
+
+private enum class ClassType {
+    NONE, CLASS
 }
 
 class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.Visitor<Unit> {
     private val scopes = Stack<MutableMap<String, Boolean>>()
     private var currentFunction = FunctionType.NONE
+    private var currentClass = ClassType.NONE
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
         beginScope()
@@ -155,12 +160,31 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         if (currentFunction == FunctionType.NONE) {
             Klox.error(stmt.keyword, "Can't return from top-level code.")
         }
-        stmt.value?.let { resolve(it) }
+        stmt.value?.let {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                Klox.error(stmt.keyword, "Can't return a value from an initializer.");
+            }
+            resolve(it)
+        }
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
+        val enclosingClass = currentClass
+        currentClass = ClassType.CLASS
         declare(stmt.name)
         define(stmt.name)
+        beginScope()
+        scopes.peek()["this"] = true
+        for (method in stmt.methods) {
+            var declaration = if (method.name.lexeme == "init") {
+                FunctionType.INITIALIZER
+            } else {
+                FunctionType.METHOD
+            }
+            resolveFunction(method, declaration)
+        }
+        endScope()
+        currentClass = enclosingClass
     }
 
     // Properties are resolved dynamically, so the resolver doesn't need to do anything here.
@@ -171,5 +195,13 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
     override fun visitSetExpr(expr: Expr.Set) {
         resolve(expr.value)
         resolve(expr.obj)
+    }
+
+    override fun visitThisExpr(expr: Expr.This) {
+        if (currentClass == ClassType.NONE) {
+            Klox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            return
+        }
+        resolveLocal(expr, expr.keyword)
     }
 }

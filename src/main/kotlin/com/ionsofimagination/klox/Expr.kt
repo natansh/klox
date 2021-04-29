@@ -10,6 +10,7 @@ sealed class Expr {
         fun visitAssignExpr(expr: Assign): R
         fun visitLogicalExpr(expr: Logical): R
         fun visitSetExpr(expr: Set): R
+        fun visitThisExpr(expr: This): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
     }
@@ -62,6 +63,11 @@ sealed class Expr {
         val value: Expr
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitSetExpr(this)
+    }
+    class This(
+        val keyword: Token
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitThisExpr(this)
     }
     class Unary(
         val operator: Token,

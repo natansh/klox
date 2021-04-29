@@ -255,7 +255,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun unary(): Expr =
-        if(match(TokenType.BANG, TokenType.MINUS)) {
+        if (match(TokenType.BANG, TokenType.MINUS)) {
             Expr.Unary(previous(), unary())
         } else {
             call()
@@ -301,6 +301,7 @@ class Parser(private val tokens: List<Token>) {
             match(TokenType.NIL) -> Expr.Literal(null)
             match(TokenType.NUMBER) -> Expr.Literal(token.literal)
             match(TokenType.STRING) -> Expr.Literal(token.literal)
+            match(TokenType.THIS) -> Expr.This(token)
             match(TokenType.IDENTIFIER) -> Expr.Variable(token)
             match(TokenType.LEFT_PAREN) -> {
                 val expression = expression()
@@ -312,8 +313,8 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun consume(tokenType: TokenType, message: String): Token {
-        if (match(tokenType)) {
-            return previous()
+        if (check(tokenType)) {
+            return advance()
         }
         throw error(peek(), message)
     }
@@ -353,6 +354,9 @@ class Parser(private val tokens: List<Token>) {
     private fun isAtEnd(): Boolean = peek().type == TokenType.EOF
     private fun peek(): Token = tokens[current]
     private fun previous(): Token = tokens[current - 1]
-    private fun advance() = current++
+    private fun advance(): Token {
+        if (!isAtEnd()) current++
+        return previous()
+    }
     private fun check(tokenType: TokenType) = peek().type == tokenType
 }

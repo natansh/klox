@@ -126,7 +126,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     private fun lookUpVariable(name: Token, expr: Expr): Any? {
         val distance = locals[expr]
         return if (distance != null) {
-            environment.getAt(distance, name)
+            environment.getAt(distance, name.lexeme)
         } else {
             globals.get(name)
         }
@@ -258,21 +258,20 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        environment.define(stmt.name.lexeme, LoxFunction(stmt, environment))
+        environment.define(stmt.name.lexeme, LoxFunction(stmt, environment, false))
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) =
         throw Return(stmt.value?.let { evaluate(it) })
 
     override fun visitClassStmt(stmt: Stmt.Class) {
-        // Do we need to define and assign separately? There might be a reason for this.
         environment.define(stmt.name.lexeme, null)
-        val klass = LoxClass(stmt.name.lexeme)
-        environment.assign(stmt.name, klass)
-        stmt.name
+        val methods = HashMap<String, LoxFunction>()
         for (method in stmt.methods) {
-            method.accept(this)
+            methods[method.name.lexeme] = LoxFunction(method, environment, method.name.lexeme == "init")
         }
+        val klass = LoxClass(stmt.name.lexeme, methods)
+        environment.assign(stmt.name, klass)
     }
 
     override fun visitGetExpr(expr: Expr.Get): Any? {
@@ -280,15 +279,26 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         if (obj is LoxInstance) {
             return obj.get(expr.name)
         }
-        throw RuntimeError(expr.name, "Only instances have properties.")
+        throw RuntimeError(
+            expr.name,
+            "Only instances have properties."
+        )
     }
 
     override fun visitSetExpr(expr: Expr.Set): Any? {
         val obj = evaluate(expr.obj)
-        val value = evaluate(expr.value)
-        if (obj is LoxInstance) {
-            obj.set(expr.name, value)
+        if (obj !is LoxInstance) {
+            throw RuntimeError(
+                expr.name,
+                "Only instances have fields."
+            )
         }
+        val value = evaluate(expr.value)
+        obj.set(expr.name, value)
         return value
+    }
+
+    override fun visitThisExpr(expr: Expr.This): Any? {
+        return lookUpVariable(expr.keyword, expr)
     }
 }
