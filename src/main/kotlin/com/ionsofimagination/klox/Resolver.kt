@@ -7,7 +7,7 @@ private enum class FunctionType {
 }
 
 private enum class ClassType {
-    NONE, CLASS
+    NONE, CLASS, SUBCLASS
 }
 
 class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.Visitor<Unit> {
@@ -70,7 +70,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
     }
 
     private fun resolve(statement: Stmt) {
-       statement.accept(this)
+        statement.accept(this)
     }
 
     private fun resolve(expr: Expr) {
@@ -178,6 +178,9 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         }
         if (stmt.superclass != null) {
             resolve(stmt.superclass)
+            beginScope()
+            scopes.peek()["super"] = true
+            currentClass = ClassType.SUBCLASS
         }
         beginScope()
         scopes.peek()["this"] = true
@@ -190,6 +193,9 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
             resolveFunction(method, declaration)
         }
         endScope()
+        if (stmt.superclass != null) {
+            endScope()
+        }
         currentClass = enclosingClass
     }
 
@@ -207,6 +213,15 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         if (currentClass == ClassType.NONE) {
             Klox.error(expr.keyword, "Can't use 'this' outside of a class.");
             return
+        }
+        resolveLocal(expr, expr.keyword)
+    }
+
+    override fun visitSuperExpr(expr: Expr.Super) {
+        if (currentClass == ClassType.NONE) {
+            Klox.error(expr.keyword, "Can't use 'super' outside of a class.");
+        } else if (currentClass != ClassType.SUBCLASS) {
+            Klox.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
         }
         resolveLocal(expr, expr.keyword)
     }

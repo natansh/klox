@@ -308,6 +308,11 @@ class Parser(private val tokens: List<Token>) {
             match(TokenType.STRING) -> Expr.Literal(token.literal)
             match(TokenType.THIS) -> Expr.This(token)
             match(TokenType.IDENTIFIER) -> Expr.Variable(token)
+            match(TokenType.SUPER) -> {
+                val keyword = previous()
+                consume(TokenType.DOT, "Expect '.' after 'super'.")
+                Expr.Super(keyword, consume(TokenType.IDENTIFIER, "Expect superclass method name."))
+            }
             match(TokenType.LEFT_PAREN) -> {
                 val expression = expression()
                 consume(TokenType.RIGHT_PAREN, "Expect ')' after expression")

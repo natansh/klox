@@ -1,9 +1,5 @@
-class Doughnut {
-  cook() {
-    print "Fry until golden brown.";
-  }
+{
+  class A {}
+  class B < A {}
+  print B; // expect: B
 }
-
-class BostonCream < Doughnut {}
-
-BostonCream().cook();

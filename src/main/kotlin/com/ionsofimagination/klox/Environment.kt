@@ -1,6 +1,6 @@
 package com.ionsofimagination.klox
 
-class Environment(private val enclosing: Environment? = null) {
+class Environment(val enclosing: Environment? = null) {
     private var values: MutableMap<String, Any?> = HashMap()
 
     fun define(name: String, value: Any?) {

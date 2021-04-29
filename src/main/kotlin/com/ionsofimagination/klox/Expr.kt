@@ -13,6 +13,7 @@ sealed class Expr {
         fun visitThisExpr(expr: This): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
+        fun visitSuperExpr(expr: Super): R
     }
     class Binary(
         val left: Expr,
@@ -79,6 +80,12 @@ sealed class Expr {
         val name: Token
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVariableExpr(this)
+    }
+    class Super(
+        val keyword: Token,
+        val method: Token
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R = visitor.visitSuperExpr(this)
     }
 
     abstract fun <R> accept(visitor: Visitor<R>): R

@@ -26,6 +26,7 @@ class GenerateAst {
                 "This: Token keyword",
                 "Unary: Token operator, Expr right",
                 "Variable: Token name",
+                "Super: Token keyword, Token method",
             ))
             defineAst(outputDir, "Stmt", listOf(
                 "Expression: Expr expression",
