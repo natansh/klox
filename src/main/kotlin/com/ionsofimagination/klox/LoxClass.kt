@@ -1,18 +1,18 @@
 package com.ionsofimagination.klox
 
 class LoxClass(val name: String, val superclass: LoxClass?, methods: Map<String, LoxFunction>): LoxCallable {
-    private val _methods: MutableMap<String, LoxFunction>
-    val methods: Map<String, LoxFunction>
-        get() = _methods
+    private val methods: MutableMap<String, LoxFunction>
 
     init {
-        this._methods = HashMap(methods)
+        this.methods = HashMap(methods)
     }
 
     fun findMethod(name: String): LoxFunction? {
-        return if (methods.containsKey(name)) {
-            methods[name]
-        } else null
+        return when {
+            methods.containsKey(name) -> methods[name]
+            superclass != null -> superclass.findMethod(name)
+            else -> null
+        }
     }
 
     override fun toString(): String {
