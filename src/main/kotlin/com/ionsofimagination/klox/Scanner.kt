@@ -11,16 +11,18 @@ class Scanner(private val source: String) {
             start = current
             scanToken()
         }
+        // When we run out of tokens and get to the end of file, the loop above will terminate, but we wouldn't have
+        // specifically added a EOF token within that loop. Add it here.
+        // The token isn't strictly needed, but it helps make the parser logic a bit more elegant.
         tokens.add(Token(TokenType.EOF, "", null, line))
         return tokens
     }
 
-    private fun isAtEnd(): Boolean {
-        return current >= source.length
-    }
+    private fun isAtEnd(): Boolean = current >= source.length
 
     private fun scanToken() {
         when (val c = advance()) {
+            // Single-character tokens
             '(' -> addToken(TokenType.LEFT_PAREN)
             ')' -> addToken(TokenType.RIGHT_PAREN)
             '{' -> addToken(TokenType.LEFT_BRACE)
@@ -31,23 +33,27 @@ class Scanner(private val source: String) {
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            // One or two character tokens.
             '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
             '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
             // Comments also begin with a /, hence we need some custom handling.
             '/' -> {
+                // This matches comments.
                 if (match('/')) {
                     while (peek() != '\n' && !isAtEnd()) advance()
-                } else {
+                } else if (match('*')) {
                     addToken(TokenType.SLASH)
                 }
             }
+            // Ignore whitespace
             ' ', '\r', '\t' -> Unit
+            // Ignore newlines, but do increment the line number.
             '\n' -> line += 1
             '"' -> string()
             else -> {
-                // Digit is easier to check separately.
+                // Numbers and identifiers are easier to check separately from the simpler cases.
                 when {
                     isDigit(c) -> number()
                     isAlpha(c) -> identifier()
