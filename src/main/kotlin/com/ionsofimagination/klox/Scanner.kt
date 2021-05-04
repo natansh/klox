@@ -5,6 +5,7 @@ class Scanner(private val source: String) {
     private var start = 0
     private var current = 0
     private var line = 1
+    private var commentNesting = 0
 
     fun scanTokens(): List<Token> {
         while (!isAtEnd()) {
@@ -41,10 +42,10 @@ class Scanner(private val source: String) {
             // Comments also begin with a /, hence we need some custom handling.
             '/' -> {
                 // This matches comments.
-                if (match('/')) {
-                    while (peek() != '\n' && !isAtEnd()) advance()
-                } else {
-                    addToken(TokenType.SLASH)
+                when {
+                    match('/') -> while (peek() != '\n' && !isAtEnd()) advance()
+                    match('*') -> multilineComment()
+                    else -> addToken(TokenType.SLASH)
                 }
             }
             // Ignore whitespace
@@ -60,6 +61,32 @@ class Scanner(private val source: String) {
                     else -> Klox.error(line, "Unexpected character.")
                 }
             }
+        }
+    }
+
+    // The first two characters '/*' have already been matched by the time we get here.
+    private fun multilineComment() {
+        commentNesting = 1
+        while (!isAtEnd()) {
+            when (advance()) {
+                // Check opening comment
+                '/' -> if (match('*')) commentNesting++
+                // Check closing comment
+                '*' -> if (match('/')) {
+                    commentNesting--
+                    if (commentNesting == 0) {
+                        // Comments are not added as a token.
+                        return
+                    }
+                }
+                // Handle new lines
+                '\n' -> line++
+            }
+        }
+        // Check for unterminated multi-line comment
+        if (isAtEnd()) {
+            Klox.error(line, "Unterminated multi-line comment.")
+            return
         }
     }
 
