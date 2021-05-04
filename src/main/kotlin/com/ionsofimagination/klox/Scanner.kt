@@ -1,6 +1,6 @@
 package com.ionsofimagination.klox
 
-class Scanner(val source: String) {
+class Scanner(private val source: String) {
     private var tokens: MutableList<Token> = ArrayList()
     private var start = 0
     private var current = 0
@@ -48,12 +48,10 @@ class Scanner(val source: String) {
             '"' -> string()
             else -> {
                 // Digit is easier to check separately.
-                if (isDigit(c)) {
-                    number()
-                } else if (isAlpha(c)) {
-                    identifier()
-                } else {
-                    Klox.error(line, "Unexpected character.")
+                when {
+                    isDigit(c) -> number()
+                    isAlpha(c) -> identifier()
+                    else -> Klox.error(line, "Unexpected character.")
                 }
             }
         }

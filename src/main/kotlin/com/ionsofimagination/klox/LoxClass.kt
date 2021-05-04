@@ -1,6 +1,6 @@
 package com.ionsofimagination.klox
 
-class LoxClass(val name: String, val superclass: LoxClass?, methods: Map<String, LoxFunction>) : LoxCallable {
+class LoxClass(val name: String, private val superclass: LoxClass?, methods: Map<String, LoxFunction>) : LoxCallable {
     private val methods: MutableMap<String, LoxFunction>
 
     init {
@@ -19,10 +19,10 @@ class LoxClass(val name: String, val superclass: LoxClass?, methods: Map<String,
         return name
     }
 
-    override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+    override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
         val instance = LoxInstance(this)
         // Run initializer.
-        findMethod("init")?.let { it.bind(instance).call(interpreter, arguments) }
+        findMethod("init")?.bind(instance)?.call(interpreter, arguments)
         return instance
     }
 

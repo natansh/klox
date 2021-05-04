@@ -7,7 +7,7 @@ import kotlin.contracts.contract
 class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     // Why keep global as a separate variable? So that native/foreign functions can be added directly to the global
     // environment.
-    val globals = Environment()
+    private val globals = Environment()
     private var environment = globals
     private val locals: MutableMap<Expr, Int> = HashMap()
 
@@ -20,7 +20,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
             override fun call(
                 interpreter: Interpreter,
                 arguments: List<Any?>
-            ): Any? {
+            ): Any {
                 return System.currentTimeMillis().toDouble() / 1000.0
             }
 
@@ -40,7 +40,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         }
     }
 
-    fun stringify(obj: Any?): String {
+    private fun stringify(obj: Any?): String {
         if (obj == null) return "nil"
         if (obj is Double) {
             val text = obj.toString()
@@ -52,7 +52,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return obj.toString()
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary): Any? {
+    override fun visitBinaryExpr(expr: Expr.Binary): Any {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
         return when (expr.operator.type) {
@@ -107,7 +107,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
     override fun visitLiteralExpr(expr: Expr.Literal): Any? = expr.value
 
-    override fun visitUnaryExpr(expr: Expr.Unary): Any? {
+    override fun visitUnaryExpr(expr: Expr.Unary): Any {
         val right = evaluate(expr.right)
         return when (expr.operator.type) {
             TokenType.MINUS -> {
@@ -322,7 +322,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return lookUpVariable(expr.keyword, expr)
     }
 
-    override fun visitSuperExpr(expr: Expr.Super): Any? {
+    override fun visitSuperExpr(expr: Expr.Super): Any {
         val distance = locals[expr]!!
         val superclass = environment.getAt(
             distance, "super"

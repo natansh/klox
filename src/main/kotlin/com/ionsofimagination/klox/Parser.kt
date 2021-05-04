@@ -37,7 +37,7 @@ class Parser(private val tokens: List<Token>) {
             superclass = Expr.Variable(previous())
         }
         consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
-        var methods = mutableListOf<Stmt.Function>()
+        val methods = mutableListOf<Stmt.Function>()
         while (!isAtEnd() && !check(TokenType.RIGHT_BRACE)) {
             methods.add(function("method"))
         }
@@ -77,20 +77,14 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun statement(): Stmt {
-        return if (match(TokenType.PRINT)) {
-            printStatement()
-        } else if (match(TokenType.LEFT_BRACE)) {
-            return Stmt.Block(block())
-        } else if (match(TokenType.IF)) {
-            ifStatement()
-        } else if (match(TokenType.WHILE)) {
-            whileStatement()
-        } else if (match(TokenType.FOR)) {
-            forStatement()
-        } else if (match(TokenType.RETURN)) {
-            returnStatement()
-        } else {
-            expressionStatement()
+        return when {
+            match(TokenType.PRINT) -> printStatement()
+            match(TokenType.LEFT_BRACE) -> return Stmt.Block(block())
+            match(TokenType.IF) -> ifStatement()
+            match(TokenType.WHILE) -> whileStatement()
+            match(TokenType.FOR) -> forStatement()
+            match(TokenType.RETURN) -> returnStatement()
+            else -> expressionStatement()
         }
     }
 

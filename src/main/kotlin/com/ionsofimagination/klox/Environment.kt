@@ -30,8 +30,7 @@ class Environment(val enclosing: Environment? = null) {
     fun getAt(distance: Int, name: String): Any? {
         // Why take from values and not use the `get` on environment? Because we want to be
         // specific about which environment we take it from.
-        val value = ancestor(distance)?.values?.get(name)
-        return value
+        return ancestor(distance)?.values?.get(name)
     }
 
     fun assignAt(value: Any?, name: Token, distance: Int) {

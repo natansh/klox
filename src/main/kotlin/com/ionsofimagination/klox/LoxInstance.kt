@@ -16,7 +16,7 @@ class LoxInstance(private val klass: LoxClass) {
 
         // Theoretically, nil can be returned here. But more often than not, it's a bug when we try to access a field
         // that we haven't ever set.
-        throw RuntimeError(name, "Undefined property '" + name.lexeme.toString() + "'.")
+        throw RuntimeError(name, "Undefined property '" + name.lexeme + "'.")
     }
 
     fun set(name: Token, value: Any?) {

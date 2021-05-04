@@ -49,7 +49,7 @@ class GenerateAst {
         private const val indent = "    "
 
         // The types are still defined Java-style, but are converted into Kotlin code through string manipulation.
-        fun defineAst(outputDir: String, baseName: String, types: List<String>) {
+        private fun defineAst(outputDir: String, baseName: String, types: List<String>) {
             val path: String = "$outputDir/$baseName.kt"
             val writer = PrintWriter(path, "UTF-8")
             writer.apply {

@@ -188,7 +188,7 @@ class Resolver(private val interpreter: Interpreter) : Expr.Visitor<Unit>, Stmt.
         beginScope()
         scopes.peek()["this"] = true
         for (method in stmt.methods) {
-            var declaration = if (method.name.lexeme == "init") {
+            val declaration = if (method.name.lexeme == "init") {
                 FunctionType.INITIALIZER
             } else {
                 FunctionType.METHOD
