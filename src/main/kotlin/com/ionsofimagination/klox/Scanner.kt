@@ -43,7 +43,7 @@ class Scanner(private val source: String) {
                 // This matches comments.
                 if (match('/')) {
                     while (peek() != '\n' && !isAtEnd()) advance()
-                } else if (match('*')) {
+                } else {
                     addToken(TokenType.SLASH)
                 }
             }
